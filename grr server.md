@@ -5,6 +5,7 @@
 server  = root/toor (?)  
 web ui = dcistudent/P@ssw0rd
 
+After logging in to the GRR server, verify IP address using ip a.  
 ```
 root@grr-server:~# ip a
 
@@ -21,11 +22,13 @@ root@grr-server:~# ip a
     inet6 fe80::f5:e4ff:fec7:d16b/64 scope link 
        valid_lft forever preferred_lft forever
 ```
+
+Once we have the IP address, we can make the configuration changes to the /etc/grr/server.local.yaml file.  
 ```
 vi /etc/grr/server.local.yaml
-  1 AdminUI.url: http://10.10.10.4:8000
-*   *   *   *   *   *   *   *   *   *
-  88 Client.server_urls: http://10.10.10.4:8080/
+1 AdminUI.url: http://10.10.10.4:8000
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+88 Client.server_urls: http://10.10.10.4:8080/
 ```
 Ensure the IP in the lines above is the IP of the GRR server!
 
