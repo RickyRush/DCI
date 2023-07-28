@@ -32,7 +32,7 @@ vi /etc/grr/server.local.yaml
 ```
 Ensure the IP in the lines above is the IP of the GRR server!
 
-After saving changes to the yaml we need to repack the clients. Intuitively, we run the repack_clients command.  
+If you change the GRR server IP address in the yaml, you must reconfigure the GRR agents by repacking them with the new information in the server.local.yaml file and then push them back out to the clients.
 ```
 grr_config_updater repack_clients
 ```
