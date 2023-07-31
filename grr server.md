@@ -39,16 +39,29 @@ grr_config_updater repack_clients
 
 After running all these commands, you should be able to connect to the GRR Web UI from our Windows 10 box using the creds listed above.
 
-Once connected, follow the file flow on the right to install and deploy the local agent.  
-Manage binaries -> Executables -> Windows -> Installers - Select and download AMD64.exe -> Show file location -> run as administrator
+Once connected, follow the file flow on the left to install and deploy the local agent.  
+Manage binaries -> Executables -> Windows -> Installers - Select and download GRR_3.1.0.2_amd64.exe -> Show file location -> run as administrator
 
 Next, hit the spyglass next to search box - we should see host data here! Now we can use the GUI to make our queries against host data. 
 
 And now the GRR server is configured and we can successfully deploy and view agent information!
 
 
+---
+### Analyzing with GRR
 
+#### File Path Examples  
 
+All executables or dlls in each user’s download directory:  
+`%%users.homedir%%\Downloads\*.{exe,dll}`
+
+All .evtx files found up to three directories under C:\Windows\System32\winevt”:  
+
+`%%environ_systemroot%%\System32\winevt\**.evtx`
+
+“findme.txt” iles in user homedirs, up to 10 directories deep:
+
+`%%users.homedir%%/**10/findme.txt`
 
 
 
