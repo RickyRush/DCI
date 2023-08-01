@@ -1,5 +1,5 @@
 
-### GRRRRRRR ( Google Rapid Response )
+### GRRRRRRR ( GRR Rapid Response )
 [GRR Documentation](https://grr-doc.readthedocs.io/en/latest/)
 
 server  = root/toor (?)  
@@ -48,7 +48,7 @@ And now the GRR server is configured and we can successfully deploy and view age
 
 
 ---
-### Analyzing with GRR
+### Threat Hunting with GRR
 
 #### File Path Examples  
 
@@ -63,10 +63,24 @@ All .evtx files found up to three directories under C:\Windows\System32\winevtâ€
 
 `%%users.homedir%%/**10/findme.txt`
 
+Query REG keys
 
+Start new flow -> Registry -> Registry Finder  
+Here you can specify paths just like the file system. Don't use the CollectRunKeyBinaries flow!  
 
+Using Rekall
 
+To use Rekall, we need to work within memory. So select "Memory" under the start new flow menu.
 
+AnalyzeClientMemory -> Plugins -> type 'pslist' in the box here. This will literally just run a process list. 
+
+For a list of the Rekall plugins available, check 
+[here](https://rekall.readthedocs.io/en/latest/plugins.html).  
+Notable plugins include pslist, users, object_tree.   
+
+With the object_tree plugin, we can add regex arguments I guess?
+
+type_regex = "Mutant"
 
 
 
