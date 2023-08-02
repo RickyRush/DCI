@@ -1,3 +1,6 @@
+### Partitioning
+---
+
 wiping linux drive
 
 ```dc3dd wipe=/dev/nvme1n1p1 tpat="Media wiped on 20230727 by Caleb McLean"```  
