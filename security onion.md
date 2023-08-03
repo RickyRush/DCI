@@ -122,7 +122,7 @@ From Desktop:
 
 #### Verify configuration works!
 
-`vi /etc/nsm/rules/rules.local`  
+`vi /etc/nsm/rules/local.rules`  
 ```
     1 alert icmp any any -> $HOME_NET any (msg:"Incoming ICMP packet"; sid:10000001;)
 ```
@@ -174,4 +174,89 @@ What mime type was identified with the executable?
 
 What is the MD5 of the executable?  
 `` 
+
+
+`snort -T -c /etc/nsm/rules/local.rules`  
+
+LOCAL.RULES!  
+IF YOU USE RULES.LOCAL YOU WILL TAKE THE L!  
+
+`alert udp any any -> any any (msg:"DNS Request for drgeorges.com"; content: "drgeorges"; content: "com"; sid:1000054;)`  
+
+`alert udp any any -> any any (msg:"DNS Request for news.hqrls.com"; content: "news"; content: "hqrls"; content: "com"; sid:1000055;)`
+
+```
+
+EXAM USER MUST USE TCPREPLAY!  
+SAMPLE SNORT RULES IN 2.3-12  
+alert udp any any -> any any (msg:"Known Good Domain"; content:"google"; sid: 1000117;)
+alert ip any any <> 172.27.2.3 any (msg:"Known Good IP"; sid: 10000145;)
+NOTE: any any <> reads anything in OR out
+
+EDIT RULES:
+sudo vi /etc/nsm/rules/rules.local
+
+UPDATE RULES:
+sudo rule-update
+CHECK TO MAKE SURE THEY'RE IN THE DOWNLOADED.RULES
+tail /etc/nsm/rules/downloaded.rules
+
+
+IOC LIST:Be sure to remove '.' at the beginning of IOC names
+SNORT BUILT IN RULES VALIDATION TEST
+snort -T -c /etc/nsm/rules/local.rules
+
+TCP REPLAY:
+sudo tcpreplay -t -i eth0 <filename>
+example from exercise:  sudo tcpreplay -t -i eth0 analyze.pcapng
+
+
+SECURE TRANSFER BETWEEN HOSTS:
+winSCP
+VI
+exit edit mode
+g = global
+
+:%s/\./";content: "/g
+^^^
+this will separate all domains into their own pieces, ie. content: "www";content: "google";content: "com"
+
+Once you run this in the list of domains, you can save the file and go from there.
+
+
+FINDS 'foobar' and inserts a sequential sid starting at 1100000
+:let @a=1100000 | %S/foobar/\=''.(@a+setreg('a',@a+1))/g
+
+QUESTIONS:
+1. HOW DID YOU PASTE THE IOC LISTS INTO CMD LINE?
+POWERSHELL NOT MUCH OF ANY USE ON THIS FIRST EXAM
+REVIEW GRR
+
+```
+
+
+you don't need a unique msg or sid, just the content field is most important.
+
+
+
+```
+def generate_snort_rule(domain):
+    rule_template = 'alert udp any any -> any 53 (msg:"DNS Query for {0}"; content:"|03|{1}|00|"; nocase; classtype:dns; sid:{2}; rev:1;)\n'
+    rule_id = 100001
+
+    return rule_template.format(domain, '.'.join(domain.split('.')[:-1]), rule_id)
+
+domains = [
+    "GT446.ezua.COM",
+    "aunewsonline.com",
+    # Add the rest of the domains here
+]
+
+with open("snort_rules.rules", "w") as f:
+    for domain in domains:
+        f.write(generate_snort_rule(domain))
+        rule_id += 1
+
+
+```
 
