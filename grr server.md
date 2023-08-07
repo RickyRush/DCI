@@ -88,7 +88,3 @@ type_regex = "Mutant"
 
 
 
-
-
-
-
