@@ -3,7 +3,7 @@
 
 #### 3-1-2
 
-![Alt text](images\ex2map1.png)
+![Alt text](ex2map1.png)
 
 
 
@@ -40,4 +40,4 @@
 
 
 
-![Alt text](images\ex2map2.png)
+![Alt text](ex2map2.png)
