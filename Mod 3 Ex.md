@@ -3,7 +3,7 @@
 
 ## 3-1-2
 ---
-![Alt text](image\ex3-2map1.png)
+![Alt text](image/ex3-2map1.png)
 
 Question 1  
 Does Workgroup 1 have access to the Web Server (www in DMZ)?  
@@ -25,7 +25,7 @@ Question 5
 A coworker in Workgroup 3 needs to send out an email to a coworker in Workgroup 1. What is the correct series of traffic network devices for this email to be sent and then received by the coworker?  
 H, G, E, D, A, B, C, C, B, A, D, E, G
 
-![Alt text](image\ex3-2map2.png)
+![Alt text](image/ex3-2map2.png)
 
 Question 6  
 You are in Workgroup 1 and the following actions occur:
@@ -108,7 +108,7 @@ The installation of the tap will require a temporary break in the network connec
 
 
 
-![Alt text](image\ex3-3map1.png)
+![Alt text](image/ex3-3map1.png)
 
 Question 11
 As the packet travels from Computer A to Computer B, what is the packet's source MAC address within Network 1?  
@@ -160,7 +160,7 @@ As the packet travels from Computer A to Computer B, what is the destination IP 
 32.54.1.21  
 
 
-![Alt text](image\ex3-3map2.png)
+![Alt text](image/ex3-3map2.png)
 
 Question 23  
 If a packet was traveling from Computer C to Computer B, what is the source IP address that Sniffer 2 will see?  
@@ -194,8 +194,8 @@ Question 30
 If a packet was traveling from Computer A to Computer D, what destination IP address will be seen by Sniffer 3?  
 172.16.1.5  
 
-![Alt text](image\ex3-3dev1.png)  
-![Alt text](image\ex3-3map3.png)  
+![Alt text](image/ex3-3dev1.png)  
+![Alt text](image/ex3-3map3.png)  
 
 ### Scenario 1  
 ---
@@ -243,7 +243,7 @@ What additional questions would you ask the network engineer or system administr
 ---
 The customer states that a person is using a workstation on Switch 01 and is performing suspicious actions against the Victim Server on Switch 04.  
 
-![Alt text](image\ex3-3map4.png)  
+![Alt text](image/ex3-3map4.png)  
 
 Question 38  
 Using the local organic sensors, why is Switch 01 the best placement option?  
@@ -256,7 +256,7 @@ If the malicious actor has remote access, tapping at Switch01 will no longer all
 ### Scenario 4
 ---
 The subject is now an unknown attacker coming from the Internet. The arrow pointing to the firewall indicating a bad location is placed in both examples to emphasize that a CPT member should never try to place a network monitor directly into any firewall or router. In this example, both Switch 05 and Switch 03 are good locations to place a monitor.   
-![Alt text](image\image\ex3-3map5.png)  
+![Alt text](image/ex3-3map5.png)  
 
 Question 40   
 Why would Switch 05 be a better location to monitor than Switch 03? What could be some benefits of monitoring Switch 03?  
