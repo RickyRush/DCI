@@ -110,13 +110,13 @@ The installation of the tap will require a temporary break in the network connec
 
 ![Alt text](image/ex3-3map1.png)
 
-Question 11
+Question 11  
 As the packet travels from Computer A to Computer B, what is the packet's source MAC address within Network 1?  
 11:3D:35:99:43:FD  
 
 Question 12  
 As the packet travels from Computer A to Computer B, what is the destination MAC address as the packet leaves Router X?  
-11:3D:35:99:43:FD  
+00:2B:11:32:FA:34  
 
 Question 13  
 As the packet travels from Computer A to Computer B, what is the source IP address as the packet leaves Router X?  
@@ -217,7 +217,7 @@ IP address. Less volatile/not in flux
 
 Question 33  
 Which ports/protocols would you use?  
-Monitor for SMB/FTP
+Monitor for SMB/FTP/HTTP/TFTP
 
 Question 34  
 Based on what is provided, what other questions would you ask the network engineer or the system administrator?
@@ -264,3 +264,187 @@ Switch05 will allow us to view all traffic coming into the network from the inte
 
 ### Scenario 5
 ---
+An air traffic controller, using workstation 10.5.6.14, recently reported that her system may have been compromised. The user reported that she had been conducting research on the internet when she noticed her cursor acting in an erratic manner. After a few moments, a text file opened on the desktop and the following message was displayed: “You have been hacked!”  
+![Alt text](image/ex3-3map6.png)  
+
+Question 41  
+Using the network map and the information provided, identify the IP address of the first witness device that may contain data pertaining to this incident.  
+10.0.1.1
+
+Question 42  
+Using the network map and the information provided, identify the IP address of the second witness device that may contain data pertaining to this incident.  
+10.0.1.3  
+
+Question 43  
+Using the network map and the information provided, identify the IP address of the third witness device that may contain data pertaining to this incident.  
+10.0.1.14
+
+Question 44  
+Using the network map and the information provided, identify the IP address of the fourth witness device that may contain data pertaining to this incident.  
+10.0.1.4
+
+
+### Scenario 6
+---
+You received an alert that someone has been posting fighter maintenance records and images of fighters on a website for civilian military enthusiasts. You examined the images and determined they are pictures of aircraft assigned to Victorville Air Base. You visited the website and were able to verify that an air frame mechanic assigned to the fighter maintenance unit at Victorville Air Base uploaded the information. Upon further investigation, you found evidence of data being exfiltrated from both facility fighter sections. You have been assigned to collect network traffic to determine if any other data is being exfiltrated from the unit.  
+![Alt text](image/ex3-3map7.png)
+
+Question 45  
+Using the network map and the information provided, identify the IP address of the BEST location to install your network monitor.  
+The internet side of the 692nd FTR Wing RTR
+
+
+## 3-1-4 Develop Sensor Strategy - Place New Sensors and Reuse Local Resources
+---
+[Sensor Placement](http://www.mecs-press.org/ijisa/ijisa-v6-n2/IJISA-V6-N2-8.pdf)  
+[Sensor Placement- SANS](https://sansorg.egnyte.com/dl/pRVtSe53cF)  
+
+### Scenario 1: Ninety-Two Pines Marine Air Ground Base
+---
+The Equation Group hacking tools were leaked by third party Shadow Brokers. These hacking tools have been used to infect Windows machines worldwide. Yesterday, intelligence officials indicated that several government agency computers and servers have been infected, citing multiple reports of possible breaches targeting Windows 2KR2 Servers and Windows unpatched with remedies. As a result, an initial scan of network traffic and firewall logs (10.0.1.18) found that a host machine (10.57.4.3) is sending/receiving encrypted traffic to/from the 10.57.6.131 (server). Additionally, firewall logs from (10.0.1.18) indicate 445 traffic from the server IP to the host IP.  
+
+Restrictions  
+The supported commander does not want any network downtime.  
+
+Simulated Equipment
+- 1/10/100G in-line splitter
+- 10 GB network tap
+- 100/1000 copper Ethernet cables
+- 1 x 24 port switch (auto sensing, 10/100/1000 Mbps, video-streaming capable)
+- 1 x router
+- Supported command's local resources
+
+![Alt text](image/ex3-4map1.png)
+
+Question 1  
+Private Hawker, located at Ninety-Two Pines Marine Air Ground Base, wants to either tap the router at 10.0.1.11 or reconfigure the IDS to do full capture. What are the pros and cons of each course of action?  
+TAP router is off the table - customer does not want downtime. Adding a SPAN port on the router will get the job done. They already have a SPAN to the IDS - why can't we just plug in there?
+
+About the full capture - works great, lives off the land. BUT requires loads of space.  
+
+
+Question 2  
+What is the purpose of capturing traffic on switch 10.0.1.10, since the packet from the host to the server does not ever transverse to that switch? Why do we want to see traffic from the external internet and internal devices?  
+The C2 MUST be external
+
+
+Question 3  
+Private Hawker wants to know if tapping that port mirror/span port line between 10.0.1.10 and 10.0.1.14 will cause any network downtime. Would tapping that line cause network downtime? Why or Why not?  
+Yes, tapping will cause network downtime
+
+
+Question 4  
+Private Hawker states that she wants to configure a span port on switch 10.57.4.2. Would this be a good idea? Why or Why not?  
+No - we have limited taps and this is a waste
+
+Question 5  
+Private Hawker wants to configure a span port on switch 10.57.6.2. What information would this provide you as an analyst?  
+This would provide traffic going to/from the servers
+
+
+Question 6   
+Private Hawker wants to use and configure the HBSS on the .3 host machine (local defender’s software) in order to monitor for threat activity. Why would it be important to use organic capabilities before we use our own?  
+If we use our own tools, the threat actor may notice the change in the network  
+
+
+Question 7  
+Private Hawker wants to know why she has to monitor the network and make observations instead of immediately removing the malware from the host machine. Why is it important to monitor the network and make observations before containing and eradicating the malicious actor’s activity?  
+You can only be sure the malware didn't replicate or the actor didn't move laterally if you watch the traffic. We need to monitor it. Triage it.    
+
+
+
+### Scenario 2
+---
+The DCI intelligence analyst has found an intel report from NSA NTOC. The report suggests that a foreign cyber espionage organization has possibly compromised the Ninety-Two Pines Marine Air Ground Base classified network. The whole base is currently supporting a mission that requires 24-hour operations. The intelligence report is provided below, along with other guidance for this scenario.  
+
+Question 8  
+Private Hawker doesn't have any experience in a live network intrusion. Based on the information previously given, provide a sensor strategy describing the best location to place new sensors and which local resources will be re-purposed/configured.
+
+Develop a sensor strategy describing the best location to place new sensors and which local resources will be re-purposed/configured in the space below. Your sensor strategy can be written below in any template or format you want. Pay special attention to the impact of your decisions. Thoroughly explain why you are making these changes in the sensor strategy.  
+
+
+
+
+### Scenario 3
+---
+A new threat report issued by Mandiant Cyber Security Consulting Services | FireEye regarding new TTPs for APT1 was released today. According to Mandiant’s investigation, for the past five months, APT1 has gained access and compromised several DoD organizations. During the last two months, APT1 has been observed stealing 10.5 GB of compressed data from several technology- and DoD-contracting companies that support the U. S. Military Weapons Program. This also includes APT1’s compromise of PROJECT REAPER networks, which includes emails and sensitive documents for the U.S. Long Range Stealth Strike Bomber (LRSS-B) and U.S. Navy Advanced Attack Submarine SSN(X).  
+
+As a result, several Cyber Protection teams have been ordered to ensure all critical infrastructure assets are protected, and to search for APT1 IOCs on the network. The supported command has provided a network map with their mission critical assets highlighted in RED. The CTE team has provided an APT1-specific attack diagram with the most likely course of action.  
+
+Question 9  
+Using the map and based on the COA 1 in the attack diagram provided by the CTE team, what is the best sensor placement position, if your team only has two network sensors? Why?  
+
+
+Question 10  
+Using the same resources, what is the best sensor placement position if your team only has one network sensor? Why?  
+
+
+
+Question 11  
+Using the same resources, what is the best sensor placement position, if your team only has one network sensor and two host sensors? Why?  
+
+
+## Scenario 3-1-5: Receive and Process Baseline System Image
+---
+
+[Volatility Command Reference](https://github.com/volatilityfoundation/volatility/wiki/Command-Reference)  
+[Sysinternal's Handler](https://learn.microsoft.com/en-us/sysinternals/downloads/handle)  
+
+In this exercise, we will be comparing two system images. One live, and one baseline.  
+
+Question 1  
+Which of the following files in c:\windows\system32 have been manipulated on the livesystem capture file, compared to the baseline capture file? (Select all that apply.)  
+Runonce.exe  
+GRR.exe  
+
+Question 2  
+Putty was in the original baseline system image, but this owner decided to delete Putty.exe. What were the last 4 characters of the SHA1 hash?  
+3b1333f826e5fe36395042fe0f1b895f4a373f1b
+
+Question 3  
+Are there any new users on the live system image compared to the baseline? If yes, list them here (separated by commas if more than one).  
+dciadmin (apparently, I didn't see this)  
+Windows > System32 > SAM / SECURITY > Export File  
+
+You can now use RegView to open these files, which will allow you to expand and view the trees.  
+
+Question 4  
+Extract the registry files from the livesystem image hard drive. Are there any new run key entries that don't match the baseline? If yes, what are the paths to the binary referenced by them?  
+Users > Export NTUSER.DAT file (contains HKU)   
+
+Question 5  
+What is the correct volatility profile to use on this image?   
+Win10x64_14393  
+(Identified by stopping Volatility a bit into its run on the image)  
+
+
+Question 6  
+Which of the following processes on the current machine has the same PID as the baseline?  
+System  
+
+`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 imageinfo`  
+`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 pslist`  
+`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 netscan`  
+`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 mutantscan`  
+`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 filescan`  
+
+Question 7  
+Are there any new suspicious processes on the live system mem dump that don't match the baseline?  
+nc64.exe , ac64.exe  
+
+Question 8  
+What is the mutant of the first abnormal process, alphabetically?  
+Note: Use volatility muntantscan on the live meme dump.  
+crazy123  
+
+Question 9  
+Are there any processes on the current machine listening on UDP that were not in the baseline? If yes, what is the name of the process?   
+nc64.exe  
+
+Question 10  
+Using the first abnormal process (alphabetically), what is the absolute path to the process?   
+Program Files (x86)\Google\av64.exe
+
+Question 11  
+Using the second abnormal process (alphabetically), what is the absolute path to the process?  
+Users\DCI Student\Desktop\Exercise\config\nc64.exe
