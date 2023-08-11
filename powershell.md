@@ -60,3 +60,46 @@ Event Logs:
 `Get-EventLog -LogName System -Newest 100`  
 `Get-EventLog -LogName System -InstanceID 414 -Newest 100`  
 
+
+```
+$port = (443)
+$network = “192.168.13.”
+$range = 1..254
+$ErrorActionPreference= ‘silentlycontinue’
+$(Foreach ($add in $range)
+{ $ip = “{0}.{1}” –F $network,$add
+Write-Progress “Scanning Network” $ip -PercentComplete (($add/$range.Count)*100)
+If(Test-Connection –BufferSize 32 –Count 1 –quiet –ComputerName $ip)
+{ $socket = new-object System.Net.Sockets.TcpClient($ip, $port)
+If($socket.Connected) { “$ip port $port open”
+$socket.Close() }
+else { “$ip port $port not open ” }
+}
+}) | Out-File C:\reports\portscan.csv
+```
+
+** note the "TcpClient" field in the script! Ensure to update when scanning for UDP ports!  
+
+```
+$ipRangeStart = "192.168.13.19"
+$ipRangeEnd = "192.168.13.40"
+$port = 1434
+
+$ipRangeStartParts = $ipRangeStart.Split('.')
+$ipRangeEndParts = $ipRangeEnd.Split('.')
+
+for ($i = [int]$ipRangeStartParts[3]; $i -le [int]$ipRangeEndParts[3]; $i++) {
+    $ipToCheck = "{0}.{1}.{2}.{3}" -f $ipRangeStartParts[0], $ipRangeStartParts[1], $ipRangeStartParts[2], $i
+    $ipEndPoint = New-Object System.Net.IPEndPoint ([System.Net.IPAddress]::Parse($ipToCheck), $port)
+    $tcpClient = New-Object System.Net.Sockets.TcpClient
+
+    try {
+        $tcpClient.Connect($ipEndPoint)
+        Write-Host "Port $port is open on $ipToCheck"
+    } catch {
+        Write-Host "Port $port is closed on $ipToCheck"
+    } finally {
+        $tcpClient.Close()
+    }
+}
+```

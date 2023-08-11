@@ -425,7 +425,8 @@ System
 `volatility.exe -f 'F:\mem.mem --profile win10x64_14393 imageinfo`  
 `volatility.exe -f 'F:\mem.mem --profile win10x64_14393 pslist`  
 `volatility.exe -f 'F:\mem.mem --profile win10x64_14393 netscan`  
-`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 mutantscan`  
+`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 mutantscan --silent`  
+`volatility.exe -f 'F:\mem.mem --profile win10x64_14393 -p PID handles -t  mutant`  
 `volatility.exe -f 'F:\mem.mem --profile win10x64_14393 filescan`  
 
 Question 7  
@@ -448,3 +449,191 @@ Program Files (x86)\Google\av64.exe
 Question 11  
 Using the second abnormal process (alphabetically), what is the absolute path to the process?  
 Users\DCI Student\Desktop\Exercise\config\nc64.exe
+
+
+## Exercise 3-2-6 Perform Nmap Scan for Endpoint Identification  
+---
+ [nmap Documentation](https://nmap.org)  
+ [nmap cheat sheet](https://highon.coffee/blog/nmap-cheat-sheet/)  
+
+Question 1  
+Use Nmap to scan the endpoint 192.168.13.17. Which ports are open for the endpoint?  
+None of the options are open?
+
+Question 2  
+The operating system for the majority of endpoints is ____________.   
+Looks like Linux 3.10-3.13  
+
+Question 3  
+Based on the information about open ports, how would you classify the endpoints 192.168.13.19 and 192.168.13.20?  
+Web servers (443/80 open)  
+
+Question 4  
+Based on the ports open, which of the following hosts is most likely a workstation?  
+.10 and .11 don't exist, and the two remaining have identical ports opened.. so? Rule of thumb is to look at what has the least services running  
+
+
+## Exercise 3-2-7 Developing Rudimentary Ping Scan
+---
+[Building a Ping Sweep with Powershell](https://petri.com/building-ping-sweep-tool-powershell/)  
+[Add a Port Check to your Ping Sweep](https://petri.com/building-a-powershell-ping-sweep-tool-adding-a-port-check/)  
+[Powershell Scripting Docs](https://web.archive.org/web/20190220192836/https://docs.microsoft.com/en-us/powershell/scripting/overview?view=powershell-5.1)  
+
+
+Ping Sweep for net enumeration example:  
+`1..20 | % {"10.10.10.$($_): $(Test-Connection -count 1 -comp 10.10.10.$($_) -quiet)"}`
+
+```
+$port = (443)
+$network = “192.168.13.”
+$range = 1..254
+$ErrorActionPreference= ‘silentlycontinue’
+$(Foreach ($add in $range)
+{ $ip = “{0}.{1}” –F $network,$add
+Write-Progress “Scanning Network” $ip -PercentComplete (($add/$range.Count)*100)
+If(Test-Connection –BufferSize 32 –Count 1 –quiet –ComputerName $ip)
+{ $socket = new-object System.Net.Sockets.TcpClient($ip, $port)
+If($socket.Connected) { “$ip port $port open”
+$socket.Close() }
+else { “$ip port $port not open ” }
+}
+}) | Out-File C:\reports\portscan.csv
+```
+
+** note the "TcpClient" field in the script! Ensure to update when scanning for UDP ports!  
+
+```
+$ipRangeStart = "192.168.13.19"
+$ipRangeEnd = "192.168.13.40"
+$port = 1434
+
+$ipRangeStartParts = $ipRangeStart.Split('.')
+$ipRangeEndParts = $ipRangeEnd.Split('.')
+
+for ($i = [int]$ipRangeStartParts[3]; $i -le [int]$ipRangeEndParts[3]; $i++) {
+    $ipToCheck = "{0}.{1}.{2}.{3}" -f $ipRangeStartParts[0], $ipRangeStartParts[1], $ipRangeStartParts[2], $i
+    $ipEndPoint = New-Object System.Net.IPEndPoint ([System.Net.IPAddress]::Parse($ipToCheck), $port)
+    $tcpClient = New-Object System.Net.Sockets.TcpClient
+
+    try {
+        $tcpClient.Connect($ipEndPoint)
+        Write-Host "Port $port is open on $ipToCheck"
+    } catch {
+        Write-Host "Port $port is closed on $ipToCheck"
+    } finally {
+        $tcpClient.Close()
+    }
+}
+```
+
+
+## Exercise 3.2.8 Perform Traffic Analysis using Wireshark
+
+[Wireshark Display Filters](https://wiki.wireshark.org/DisplayFilters)  
+[Wireshark User's Guide](https://www.wireshark.org/docs/wsug_html_chunked/)  
+
+Question 1  
+Based on Total Packets, what is the most talkative external/public IP address?  
+8.28.16.201  
+Identified by going to statistics -> endpoints -> IPv4  
+
+Question 2  
+Analyze traffic related to the most talkative external IP address. Based on your analysis of this traffic, what is the purpose of this host?  
+Web Filter
+
+Question 3  
+Based on the number of packets sent and received, what is the least active external/public IP address in the traffic capture besides 204.79.197.254 and 211.149.241.70?   
+13.107.255.14
+
+Question 4  
+Research the least active external IP address. Who is the owner of this IP?  
+[Microsoft](https://whois.arin.net/rest/net/NET-13-64-0-0-1/pft?s=13.107.255.14)  
+
+Question 5  
+At about what relative time in minutes was there a huge spike in traffic?  
+23  
+statistics -> I/O Graph
+
+
+Question 6  
+Was an executable downloaded? Enter the name of the executable downloaded. If there is no evidence of an executable downloaded enter "No".  
+frame contains exe  
+pccleaner.exe  
+
+Question 7  
+Extract the executable from the previous question. What are the last four characters of the md5 hash for the executable?  
+4965  
+
+Question 8  
+Analyze the traffic after the executable was downloaded. What URL is being beaconed out to?   
+smilecare.com
+
+Question 9  
+Does the identified domain name match a known IOC for this threat?  
+Yes
+
+Question 10  
+What is the IP address of the identified domain?  
+66.77.206.85  
+
+Question 11  
+What is the interval of the beacon?  
+60 seconds  
+
+
+## Exercise 3-2-9 Analyze Obfuscated Traffic
+
+[File Signatures](https://www.garykessler.net/library/file_sigs.html)  
+[User Agent Strings](https://sansorg.egnyte.com/dl/pGWQkGIq5N)  
+[Malware Obfuscation Approaches](https://www.malwarebytes.com/blog/news/2013/03/obfuscation-malwares-best-friend)
+### Scenario
+
+Analyzing network traffic is a critical skill for an intrusion analyst. While we've looked at network traffic from aggregate perspectives (netflow, network statistics by host, etc.), we have yet to conduct more in-depth analysis of network traffic. In this exercise, you will have the opportunity to use more advanced searching and extraction capabilities in Wireshark to analyze network traffic and the artifacts contained within.  
+
+During this exercise, you will gain proficiency analyzing network traffic and web traffic to discover foretelling information and locate prescient artifacts, extract the specific artifact, and conduct follow-on analysis of the artifact.
+
+Question 1  
+Use Wireshark to analyze the provided pcap and extract the file yikr9jXET.jpg. Once you have identified and extracted the image, enter the validation code.  
+frame contains yikr9jXET.jpg  
+JpgImageFromWireshark
+
+Question 2  
+Use Wireshark to analyze the provided pcap and extract the PNG image file transferred over HTTP with an IP in the 68.85.0.0/16 network. Once you have identified and extracted the image, enter the validation code.  
+Note: Even when files are misnamed you can often identify the file type by a file signature similar to how the Linux/UNIX utility libmagic works.  
+ip.addr == 68.85.0.0/16  
+q9Xik-rTnw.bin
+PngBy5ignature  
+
+Question 3  
+Use Wireshark to identify the downloaded executable masquerading as a Windows update. What is the name of the file that was downloaded?  
+
+
+### Scenario Update 1  
+The local cyber defense capability received an intrusion detection system alert identifying an unknown User Agent string leaving the defended network.  
+
+Question 4  
+Analyze the traffic associated with the User Agent string "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.1288)" provided by the local defenders.  
+What do you suspect the client operating system is?  
+
+Question 5  
+Do you believe the impacted client has AntiVirus installed? If yes, what vendor?  
+
+Question 6  
+What value is used to uniquely identify the client?  
+
+
+
+### Scenario 2
+The network defenders were able to identify the malware running on the client and have restored the system to a known good state. Use what you learned from the command and control to identify other hosts that may be impacted by a similar strain of malware.  
+
+Note: Malware may morph over time and take on new characteristics of methods of obfuscating information. You may want to learn more about obfuscation techniques commonly used by threat agents.
+
+
+Question 7  
+Find another command and control interaction likely attributed to the same malware. What is the version of the suspected malware running on the second client?  
+
+Question 8  
+The last command and control interaction by the malware refers to an additional IP address. What is that IP address? 
+
+Question 9  
+Is there any indication that communication with that IP address was successful?  
