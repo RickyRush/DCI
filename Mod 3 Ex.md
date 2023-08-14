@@ -606,10 +606,11 @@ PngBy5ignature
 
 Question 3  
 Use Wireshark to identify the downloaded executable masquerading as a Windows update. What is the name of the file that was downloaded?  
-
+Windows updates use a ".msu" file extension. By using frame contains .msu, we can identify this. This search leads us to a packet with a MZP - zipped. Containing UPX.  SUS  
 
 ### Scenario Update 1  
 The local cyber defense capability received an intrusion detection system alert identifying an unknown User Agent string leaving the defended network.  
+http.user_agent == "XXX"  
 
 Question 4  
 Analyze the traffic associated with the User Agent string "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.1288)" provided by the local defenders.  
@@ -637,3 +638,160 @@ The last command and control interaction by the malware refers to an additional 
 
 Question 9  
 Is there any indication that communication with that IP address was successful?  
+
+
+## Exercise 3-3-12 Analyze a Host to Identify Threat Activity  
+
+The exercise says to use GRR, but GRR is busted on these VM's. Everything will isntead be done with powershell! Yippee!  
+
+Remote 1  
+172.16.12.5  
+Administrator / DC3P@ssw0rd
+
+Remote 2  
+172.16.12.3  
+Administrator / DC3P@ssw0rd
+
+Question 1  
+Use GRR to perform analysis on the first system. GRR has already been installed on the system in question and can be accessed through the web interface. You do not need to reconfigure the GRR Server for this exercise.  
+Use GRR to perform analysis on Windows Remote 1 system. Which malicious binaries are found on the Windows system? (Select all that apply.)  
+`Get-ChildItem -Path C:\ -Recurse -ErrorAction SilentlyContinue -Force | where name -in ("chr0me.exe","extension.exe", "FileHunter-Win32.exe", "server.pem")`  
+
+extension.exe  
+FileHunter-Win32.exe
+
+
+Question 2  
+Use GRR to perform analysis on the first system. GRR has already been installed on the system in question and can be accessed through the web interface. You do not need to reconfigure the GRR Server for this exercise.  
+Use GRR to answer the following question. Based on the previous two malicious binaries, did they establish persistence within the registry?  
+
+__No__  
+Yes, in the HKLM Run Key  
+Yes, in the HKCU Run Key  
+Yes, in Borland\Delphi\Locales  
+
+
+Question 3  
+First System Analysis  
+Use GRR to perform analysis on the first system. GRR has already been installed on the system in question and can be accessed through the web interface. You do not need to reconfigure the GRR Server for this exercise.   
+Use GRR to retrieve the hashes of the two malicious binaries previously found. Using the hashes, classify the type of malware the binaries are.  \
+
+`get-filehash c:\path`    
+
+Note: Using VirusTotal to check for malicious files is not a best practice. Many adversaries monitor VirusTotal in order to see if their malicious activity has been detected.    
+
+__Adware__  
+APT1 Threat  
+Keylogger  
+Ransomware  
+
+
+Question 4  
+Second System Analysis  
+Use PowerShell to perform analysis on the second system.  
+The file System32baseline.txt is provided on the Windows Remote 2 Desktop. This file is a baseline of filenames and SHA-256 hashes for System32, which you will be comparing with the live system.  
+On the remote machine, which malicious binaries are on the system? (Select all that apply.)  
+
+`Get-ChildItem -Path C:\ -Recurse -ErrorAction SilentlyContinue -Force | where name -in ("extrac32.exe","excel2018.exe", "jackinthebox.exe", "sxstrace.exe")`  
+
+__extrac32.exe__  
+excel2017.exe  
+__jackinthebox.exe__  
+__sxstrace.exe__  
+
+
+Question 5  
+Second System Analysis  
+Use PowerShell to perform analysis on the second system.  
+The file System32baseline.txt is provided on the Windows Remote 2 Desktop. This file is a baseline of filenames and SHA-256 hashes for System32, which you will be comparing with the live system.   
+
+Which files have been changed since the baseline was made?  
+
+`Select-String -Pattern "Noise.dat" -Path "C:\Users\Student\Desktop\file.txt"`  
+ 
+```
+file.txt:2184:"SHA1","8BF0A8F366BF9DAF344DF4396F7A714642FFADAF","C:\Windows\System32\NOISE.DAT"
+```
+```
+[172.16.12.3]: PS C:\Users\student\desktop> get-filehash -algorithm sha1 c:\windows\system32\noise.dat
+
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA1            8BF0A8F366BF9DAF344DF4396F7A714642FFADAF                               C:\windows\system32\noise.dat
+```
+```
+file.txt:2191:"SHA1","5BE67DAD56E33CDBD1C327948EE70D43E69ED106","C:\Windows\System32\notepad.exe"
+file.txt:14507:"SHA1","97424EE3AEC05C6E6A0857D8387D0FFE5B6D1B88","C:\Windows\System32\en-US\notepad.exe.mui"
+```
+```
+[172.16.12.3]: PS C:\Users\student\desktop> get-filehash -algorithm sha1 c:\windows\system32\notepad.exe
+
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA1            5BE67DAD56E33CDBD1C327948EE70D43E69ED106                               C:\windows\system32\notepad.exe
+```
+```
+[172.16.12.3]: PS C:\Users\student\desktop> get-filehash -algorithm sha1 c:\windows\system32\en-US\notepad.exe.mui
+
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA1            97424EE3AEC05C6E6A0857D8387D0FFE5B6D1B88                               C:\windows\system32\en-US\not...
+```
+
+
+Noise.Dat  
+recoverydisk.exe  
+notepad.exe  
+__None__
+
+
+Question 6  
+Second System Analysis  
+Use PowerShell to perform analysis on the second system.  
+The file System32baseline.txt is provided on the Windows Remote 2 Desktop. This file is a baseline of filenames and SHA-256 hashes for System32, which you will be comparing with the live system.   
+
+Which file is in the baseline and in the System32 directory?  
+
+`Select-String -Pattern "redisc.exe.mui" -Path "C:\Users\Student\Desktop\file.txt"`  
+
+None of the are the answer. Yay busted exercise!  
+
+recdisc.exe.mui  
+systemrestore.exe  
+drivers.inf  
+recover.dat  
+
+## Exercise 3-3-13 Analyze Hosts to Determine IOC Presence
+
+[Service Controller Command](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-xp/bb490995(v=technet.10)?redirectedfrom=MSDN)  
+[Windows Automatic Startup Locations](https://www.ghacks.net/2016/06/04/windows-automatic-startup-locations/)
+[Wireshark Display Filters](https://wiki.wireshark.org/DisplayFilters)  
+
+
+
+Question 1  
+List all domains that the host is connecting to that match the given IOCs. Provide your answer in alphabetical order with a space between each domain.  
+Example answer: abc.com google.com tiger.com  
+
+Question 2  
+Out of the following GET paths, which IOCs were requested? (Select all that apply.)  
+Backsangho.jpg  
+Images/device_index.asp  
+news/media/info.html  
+SmartNav.jpg  
+
+
+Question 3  
+What IP IOCs are present on the system according to a netstat output?  
+Give your answer in ascending order, based on the first octet of the IP address, with spaces between addresses.  
+Example answer: 10.5.3.1 73.2.1.2 135.2.66.7  
+
+Note: IPs will not show up in Wireshark.  
+
+Question 4  
+Using either a terminal or regedit, find all registry registry key's that have matching IOCs. What are the executables referenced that match IOCs? Place your answer in alphabetical order with spaces between multiple answers.  
+
+
+Question 5  
+Find the service name that matches the IOC list. What is the binary path of the executable it references (including the executable itself)?  
+Example answer: C:\path\to\bad.exe   
