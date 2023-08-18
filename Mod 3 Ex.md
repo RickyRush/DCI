@@ -771,14 +771,17 @@ recover.dat
 
 Question 1  
 List all domains that the host is connecting to that match the given IOCs. Provide your answer in alphabetical order with a space between each domain.  
-Example answer: abc.com google.com tiger.com  
+deebeedesigns.ca firebirdonline.com thecrownsgolf.org  
+
 
 Question 2  
 Out of the following GET paths, which IOCs were requested? (Select all that apply.)  
+`frame contains GET`  
+`http.request.method == GET`  
 Backsangho.jpg  
 Images/device_index.asp  
-news/media/info.html  
-SmartNav.jpg  
+__news/media/info.html__  
+__SmartNav.jpg__  
 
 
 Question 3  
@@ -786,12 +789,296 @@ What IP IOCs are present on the system according to a netstat output?
 Give your answer in ascending order, based on the first octet of the IP address, with spaces between addresses.  
 Example answer: 10.5.3.1 73.2.1.2 135.2.66.7  
 
-Note: IPs will not show up in Wireshark.  
+Note: IPs will not show up in Wireshark. Note again: IPs will not show up in Netstat. Use Wireshark.  
+
+63.192.38.11 65.110.1.32 140.116.70.8  
 
 Question 4  
 Using either a terminal or regedit, find all registry registry key's that have matching IOCs. What are the executables referenced that match IOCs? Place your answer in alphabetical order with spaces between multiple answers.  
+`get-item -path HKLM:\Software\Microsoft\Windows\CurrentVersion\Run`  
+`get-item -path HKCU:\Software\Microsoft\Windows\CurrentVersion\Run`  
 
 
 Question 5  
 Find the service name that matches the IOC list. What is the binary path of the executable it references (including the executable itself)?  
 Example answer: C:\path\to\bad.exe   
+`get-service`  
+`Get-CimInstance win32_service | where {$_Name -like "aec"} | select Name, DisplayName, PathName`  
+`sc qc aec`  
+GUI services interface to view executable.  
+
+
+
+## Exercise 3-3-14 Analyze a Security Event Log  
+
+`Get-EventLog -LogName Security -Newest 100`  
+`Get-EventLog -LogName Security -InstanceID 4624 -Newest 100`  
+
+Question 1  
+Use the built-in Windows Event Viewer application to open Exercise 6.2-077-Security.evtx log file in the Resources Drive. Briefly review the contents of the log.  
+What is the task category of the first logged event?  
+Log Clear 
+
+Question 2  
+What time was the event log cleared?
+(Provide times in UTC with the following format: HH:MM:SS)  
+15:42:29  
+
+Question 3  
+How many events have the event ID 4624?  
+28  
+
+Question 4  
+How many events have the event ID 4779?    
+2  
+
+Question 5  
+Apply a filter for all the failed logon events recorded. What time did the earliest failed logon attempt occur?  
+(Provide times in UTC with the following format: HH:MM:SS)  
+16:17:44  
+
+Question 6  
+What was the logon type of the earliest failed logon attempt?  
+2  
+
+Question 7  
+Is there a log event that indicates a password was changed? If so, what account had a password change?  
+Guest
+
+Question 8  
+Using a low-privilege account and reassigning privileges to a higher-access security group is one method used by threat agents to escalate privileges.
+
+Is there an event that indicates a user was added to a security group with greater authorization? What event ID recorded this privilege escalation?  
+4732  
+
+Question 9  
+What user account was added to the Administrators group?  
+Student  
+Guest? RID 501?  
+```
+A member was added to a security-enabled local group.
+
+Subject:
+	Security ID:		S-1-5-21-3703730383-877294775-1087173964-1000
+	Account Name:		student
+	Account Domain:		WIN7TEST
+	Logon ID:		0x14C048E
+
+Member:
+	Security ID:		S-1-5-21-3703730383-877294775-1087173964-501
+	Account Name:		-
+
+Group:
+	Security ID:		BUILTIN\Administrators
+	Group Name:		Administrators
+	Group Domain:		Builtin
+
+Additional Information:
+	Privileges:		
+```
+
+
+Question 10  
+What event ID is recorded in the log that does not relate to user accounts or groups?  
+6281  
+
+Question 11  
+Based on the System Integrity event, what file may be corrupted?  
+I3codeca.acm  
+
+Question 12  
+What is the I3codeca.acm file?  
+
+Select one.  
+
+__An unsigned audio codec__  
+An outdated Windows NT dll still used in Windows 7  
+An incorrectly signed Hardware Compatibility Module  
+A core Windows Kernel component that cannot be signed  
+
+
+
+
+
+
+## Exercise 3-3-15 Characterize a Suspicious File  
+
+[Malwarebytes Window Portable Executable (PE) Analysis Tools](https://www.malwarebytes.com/blog/news/2014/05/five-pe-analysis-tools-worth-looking-at)  
+[Structure of a Portable Executable (Graphic)](https://upload.wikimedia.org/wikipedia/commons/0/09/Portable_Executable_32_bit_Structure.png)  
+[Structure of a Portable Executable](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format?redirectedfrom=MSDN)  
+
+
+Question 1  
+What type of file are you analyzing?  
+
+NOTE: Get the corresponding sample from the resources drive and copy to your VM’s desktop. You may use any tool within the Malware Tools folder located on the computer.  
+.xex   
+
+Question 2  
+Does the file extension match the file type?  
+No    
+
+Question 3  
+Is the file packed? If no, type “No.” If yes, what packer was used?  
+yes - UPX was used. We can see this in the "hex" section of filealyzer.  
+
+Question 4  
+Calculate the MD5 of the compressed sample. What are the last 4 digits of the MD5?  
+944207B205C5FA4162B31C34309EB1B0  
+
+Question 5  
+Unpack the sample with an appropriate unpacking utility. Calculate the MD5 of the decompressed sample.  
+What are the last four characters of the MD5?  
+Using the UPX tool in the malware analysis folder, we can load in the file and then decompress it using the GUI.  
+CDFD211E3A0E017E8C69453A550E566B  
+
+Question 6  
+An executable is not a single file, but rather, has a series of different sections that each have a different role. The number of sections can be used to help fingerprint an executable.  
+Note: A packer will produce an executable with a reduced number of sections. Identifying the number of sections in a compressed executable tells you something about the packer, but nothing about the underlying executable. How many sections does the unpacked executable have?  
+Nine? That's what I'm seeing in the "PE Sections" section of FileAlyzer. can alsdo be read in the hex  
+
+Question 7  
+What is the target Operating System compatibility?   
+winders  
+
+
+Question 8  
+Select an import upon which this executable depends.  
+__DLLs__  
+IAP  
+IP Address  
+UPX  
+We can see this in "PE Imports". All of the files are dlls.  
+
+Question 9  
+Which imported DLLs primarily deal with establishing network communications?  
+wsock32.dll  
+
+Question 10  
+The imports table in an executable articulates not only the DLL that is required, but also the specific functions within the DLL. Which functions in the executable could indicate malicious behavior?  
+
+
+Question 11  
+What is the signature of the file?  
+Note: A portable executable has two signatures. The start of the file is often referred to as the "MZ Header." The portable executable (PE) portion of the file also has its own signature. Either will be accepted here.  
+5A4D / 00004550  
+
+Question 12  
+What registry key entry is referenced in the executable that could indicate a method of persistence?  
+For Feedback: Use the "strings" capability to identify text in the sample that may be of interest.  
+`strings filename > file.txt`  
+HKLM\Software\Microsoft\Windows\CurrentVersion\Run  
+
+Question 13  
+Are there any executables referenced in the strings that would warrant concern?  
+Yes - build.exe , cleansweep.exe  
+
+Question 14  
+There are several other strings that provide information about the executable and its intended functions. What are some of these strings that are particularly interesting?  
+Get Tick Count - gets system uptime. Can be used with sophisticated malware to check if it's running in a VM   
+
+Question 15  
+What types of activity do you believe may occur if this executable were run?  
+Host enumeration, send data to command and control. Establish persistence via run keys.    
+
+Question 16  
+If you believe a system was impacted by this executable, what is a filesystem artifact you could analyze to confirm your suspicion?  
+cleansweep.exe , build.exe , run key  
+
+Question 17  
+Use the VirusTotal.com website and check if this sample has been seen before. Use the following MD5 hash value: 944207B205C5FA4162B31C34309EB1B0.  
+
+Use an AntiVirus vendor's website to read more about this specific sample. Record the URL here.    
+
+
+
+
+
+## Exercise 3-3-16 Become Familiar with Executable Static Analysis
+
+[Kris Kendall's presnetation of Practical Malware Analysis](https://www.blackhat.com/presentations/bh-dc-07/Kendall_McMillan/Paper/bh-dc-07-Kendall_McMillan-WP.pdf)  
+[Malwarefox.com: Classes/types of malware](https://www.malwarefox.com/malware-types/)  
+
+
+Question 1  
+Calculate the MD5 hash value of the provided "xex" file. Enter the last four digits of the MD5.  
+BB7425B82141A1C0F7D60E5106676BB1  
+
+Question 2  
+Use the SHA1 value of the "xex" file to search for a sample on VirusTotal.com:  
+9dce39ac1bd36d877fdb0025ee88fdaff0627cdb  
+What class of malware do most antivirus vendors classify this sample as?  
+Trojan  
+
+Question 3  
+Use FileAlyzer to review the contents of the "xex" sample. Do you see anything that indicates this sample is packed? If no, type “No.”  
+No. Aside from UPX, if you can read strings, it isn't packed. Hex > right click > scan for strings.  There will also be a UPX tab in Filealyzer if it's packed.    
+
+Question 4  
+Review the "xex" file's imports. Do any of the imports indicate what this sample does?  
+msvcrt.dll - used for memory allocation, file i/o, exception handling  
+kernel32.dll - kernel level dll. protected by the hardware.  
+Creates files- copies file?  To what end?  
+
+Question 5  
+Are there any file references within the "xex" sample that would provide us an indicator of compromise to look for on other systems?  
+Give a justification as to why this file reference is an indicator of compromise.  
+Hex > Filenames.  
+
+Question 6  
+Are there any network-related references in the "xex" sample that could be useful as an indicator of compromise to search for network-based command and control?  
+If yes, give the filename. If there are no file references, enter "No."  
+Are there any IP or domain names?  These would be seen in strings if they existed.  
+
+Question 7  
+Turn your attention to the "dllxx" file now. Continue your static analysis of this file using the same approaches used for the "xex" sample file. Calculate the MD5 hash value of the provided "dllxx" file. Enter the last 4 digits of the MD5.  
+290934C61DE9176AD682FFDD65F0A669
+
+Question 8  
+Use the SHA1 value of the "dllxx" file to search for a sample on VirusTotal.com:  
+a4b35de71ca20fe776dc72d12fb2886736f43c22  
+What class of malware do most antivirus vendors classify this sample as?  
+
+Question 9  
+Use FileAlyzer 2 to review the contents of the "dllxx" sample. Do you see anything that indicates this sample is packed?  
+No  
+
+Question 10  
+Review the "dllxx" file's imports. Do any of the imports indicate what this sample does?   
+Creates a process and mutex, opens mutex.  
+
+Question 11  
+Are there any file references within the "dllxx" sample that would provide us an indicator of compromise to look for on other systems? If there are no file references, enter "No."  
+No(?)  
+
+Question 12  
+Are there any network-related references in the "dllxx" sample that could be useful as an indicator of compromise or to search for network-based command and control?  
+
+If yes, give the remote IP address for the malware.  
+If there are no network references, enter "No."  
+
+## Exam  
+
+All day affair. 8 hr time limit    
+It gives us the kitchen sink, we SHOULD only need Win 10 and Kali.  
+19 questions.  
+
+Expectations:  
+Q1-7 relate to a provided network map. Questions feature sensor placement based on COAs, choke points, and subnets. (Ex 3-1-3)  
+
+Q8-11 relate to looking for files within a baseline. Opening image with FTK. Locate file, file size, hash, MAC times for said file. (Ex 3-1-5)
+
+Q12 is about scanning. We can use nmap here. Identify what IPs are discovered that are absent from the provided network map.  (Ex 3-2-6) 
+
+Q13 is traffic analysis. Look through pcap to identify domain names matching a given IOC list. 3 Domains. Instructor recommends tcpdump, no thanks! (Ex 3-2-8)     
+`sudp tcpdump -n -t -r pcap.pcap udp > udp.txt`  
+`sudo cat udp.txt | grep -a -f DomainsIOC.txt`  
+Once you see the IOC domains, you can less the file and search for the domain to identify the IP address.  
+
+Q14-15 relate to ports and services. Also using nmap. Identify what ports are open and associated services. We will find a port open that will NOT be on the baseline. Nmap may not properly identify the associated service. Google the port!  
+
+** Nmap questions might be a bit difficult. IPs for fakenet have changed so it's a bit wonky.  
+
+Outside of nmap and engaging with the fakenet, the IPs are valid.  
+
+Q16-19 relate to system analysis. Using powershell to perform host analysis on a windows server and look for files. A batch file, a running process, a service, and an IOC located in system32.  (Ex 3-3-13)  
