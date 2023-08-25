@@ -1056,29 +1056,3 @@ Are there any network-related references in the "dllxx" sample that could be use
 
 If yes, give the remote IP address for the malware.  
 If there are no network references, enter "No."  
-
-## Exam  
-
-All day affair. 8 hr time limit    
-It gives us the kitchen sink, we SHOULD only need Win 10 and Kali.  
-19 questions.  
-
-Expectations:  
-Q1-7 relate to a provided network map. Questions feature sensor placement based on COAs, choke points, and subnets. (Ex 3-1-3)  
-
-Q8-11 relate to looking for files within a baseline. Opening image with FTK. Locate file, file size, hash, MAC times for said file. (Ex 3-1-5)
-
-Q12 is about scanning. We can use nmap here. Identify what IPs are discovered that are absent from the provided network map.  (Ex 3-2-6) 
-
-Q13 is traffic analysis. Look through pcap to identify domain names matching a given IOC list. 3 Domains. Instructor recommends tcpdump, no thanks! (Ex 3-2-8)     
-`sudp tcpdump -n -t -r pcap.pcap udp > udp.txt`  
-`sudo cat udp.txt | grep -a -f DomainsIOC.txt`  
-Once you see the IOC domains, you can less the file and search for the domain to identify the IP address.  
-
-Q14-15 relate to ports and services. Also using nmap. Identify what ports are open and associated services. We will find a port open that will NOT be on the baseline. Nmap may not properly identify the associated service. Google the port!  
-
-** Nmap questions might be a bit difficult. IPs for fakenet have changed so it's a bit wonky.  
-
-Outside of nmap and engaging with the fakenet, the IPs are valid.  
-
-Q16-19 relate to system analysis. Using powershell to perform host analysis on a windows server and look for files. A batch file, a running process, a service, and an IOC located in system32.  (Ex 3-3-13)  
