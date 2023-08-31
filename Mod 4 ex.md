@@ -74,6 +74,7 @@ homie got PRANKED!
 
 
 ## Exercise 4-1-2 Investigate a True Positive  
+---
 
 Question 1  
 Identify if there are indicators of compromise in the registry.  
@@ -254,6 +255,8 @@ In the whole recorded network activity, how many kilobytes were exchanged betwee
 288 KB  
 
 ## Exercise 4-1-4 Deploy GRR Agent  
+---
+
 ** Remote Deployment of GRR will be on the exam **
 
 [GRR Rapid Response Documentation](https://grr-doc.readthedocs.io/en/latest/)  
@@ -369,6 +372,7 @@ What IP-based IOC finding is present on an end point?
 
 
 ## Exercise 4-2-6 Identify Data Exfiltration Artifacts on a Windows System  
+---
 
 [List of File Signatures](https://en.wikipedia.org/wiki/List_of_file_signatures)  
 [Alternate Data Streams](https://learn.microsoft.com/en-us/archive/blogs/askcore/alternate-data-streams-in-ntfs)  
@@ -527,6 +531,7 @@ Another issue to consider is whether we missed any other ZIP or RAR files during
 `Get-Content *.txt`  
 
 ## 4-2-7 Identify Keylogger Artifacts on a Windows System
+---
 
 __Scenario__
 
@@ -609,3 +614,287 @@ Name                           Property
 Run                            OneDrive        : "C:\Users\DCI Student\AppData\Local\Microsoft\OneDrive\OneDrive.exe" /background
                                Keyboard Driver : C:\Windows\KeyX.exe
 ```
+
+
+
+## Exercise 4-2-8 Understand a Possible Phishing Attempt  * * *
+
+__Scenario__  
+
+Sometimes, systems are pulled back for forensics when a potential compromise is detected. The analysis of that host system can vary depending on the depth of the situation. In this exercise, there is a concern that one of the hosts has been compromised. The local defenders have obtained traffic from when it was believed to have happened and files from the system. They are handing off the items to you for further analysis. Students will use these files in the Exercise folder located on the Windows NAS. 
+
+__Action Summary__
+
+Analyze suspicious traffic from a host.  
+Use NetworkMiner to view network traffic.  
+Conduct analysis on artifacts found on a system.  
+
+
+__Files List:__
+
+Suspicious Files  
+1.zip  
+image.bmp  
+NetworkMiner_2-3-2.zip  
+QS12Setup.exe  
+suspicious traffic.pcap  
+
+
+[Wireshark](https://www.wireshark.org/docs/wsug_html_chunked/ChWorkBuildDisplayFilterSection.html)  
+[NetworkMiner](https://www.netresec.com/docs/NetworkMiner_Manual.pdf)  
+[QuickStego](http://www.quickcrypto.com/free-steganography-software.html)  
+
+Question 1  
+What percentage of traffic is DNS?  
+`udp.port == 53 && !icmp`  
+Statistics > Protocol Heirarchy (with no active filter)  
+__69.5%__  
+31.5%  
+40%  
+33%  
+
+
+Question 2  
+There is no SMTP traffic.  
+True  
+__False__  
+
+Question 3  
+What percentage of the traffic is SMTP?
+
+__0.2%__  
+5%  
+3%  
+0.6%  
+
+Question 4  
+What domain name looks suspicious from the SMTP traffic?  
+rocketmail.com  
+
+Question 5  
+What user’s email address is found in traffic that responded to the suspicious domain?  
+kelly[@]voterdb.com  
+
+Question 6  
+What is the subject of the emails?  
+Press Release
+
+Question 7  
+What is the name of the email attachment from the suspicious domain?    
+Follow TCP stream > 
+
+Question 8  
+If you follow the TCP stream, what type of encoding is used by SMTP for the contents of the zip file?  
+__Base64__  
+UTF-8  
+Quoted-printable   
+No encoding  
+```
+------=_=-_OpenGroupware_org_NGMime-3125-1539108025.806621-19------
+Content-Type: multipart/alternative;  boundary="----=_=-_OpenGroupware_org_NGMime-3125-1539108025.806472-18------"  
+
+------=_=-_OpenGroupware_org_NGMime-3125-1539108025.806472-18------
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Length: 573
+```
+
+Question 9  
+You are unable to carve out the attachment using Wireshark.  
+Find the packet with the bytes - copy them directly out. OR use network miner.  
+True  
+__False__  
+
+
+Question 10  
+Locate the .zip file in Network Miner and get the MD5 hash of the zip file. What are the last four characters?   
+
+Question 11  
+What is the size of the zip file?   
+
+
+Question 12  
+When was the last write time (MM/DD/YY HH:MM AM/PM)?    
+
+
+Question 13  
+Extract the .zip file using Network Miner. What is the filename of the document within the zip file?   
+
+
+Question 14  
+After analyzing the file, what does this file attempt to do?   
+
+
+Question 15  
+Use the supplied image.bmp file located in Suspicious Files. Did the password from the image open the password-protected file, 1.zip (also located in Suspicious Files)?  
+True  
+False  
+
+Question 16  
+Review the output from QuickStego. What necessary steps should be taken to obtain the real password?  
+
+
+Question 17  
+After looking at the password-protected file, what information was gathered from the host?   
+
+
+
+
+
+
+## Ex 4-2-9-15  Assess Potentially Compromised Hosts
+---
+
+Scenario
+
+The potentially compromised hosts you are investigating in this scenario are 10.10.10.7 through 10.10.10.13.
+
+Username: Administrator  
+Password: N@n0S3rveP@ssw0rd  
+
+
+Questions in this exercise ask about the following areas of attacker activity:  
+
+–  Data collected by the attacker  
+–  Command and Control IP addresses and domain names 
+–  Unauthorized access to credentials  
+–  Attempted and/or successful privilege escalation  
+–  Attempts by the adversary to evade discovery and remediation  
+–  Activities performed to discover other potential targets on the network  
+–  Any executables the adversary ran during their operation  
+–  Successful or actual lateral movements performed by the adversary  
+–  Methods of persistence used  
+–  A full accounting of any malware left on the system  
+
+
+Use your operator logs to document your process and findings. You should attempt the essays after your analysis.  
+```
+$computers = "10.10.10.7","10.10.10.8","10.10.10.9,10.10.10.10","10.10.10.11","10.10.10.12","10.10.10.13"
+$creds = Get-Credential
+#echo $computers
+
+Invoke-Command  -ComputerName $computers -ScriptBlock {COMMAND} -Credential $creds
+
+Individual commands run on hosts:  
+Get-Item -path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run  
+Get-Item -path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run  
+Get-ChildItem -Path C:\ -Filter <filename for IOC> -Recurse -ErrorAction SilentlyContinue -Force
+cat c:\Windows\System32\Drivers\etc\hosts  
+get-scheduledtask -taskname <IOC task>  
+cat c:\tmp\sys.txt < this was an enumeration results file - did they add guest to administrators? >
+```
+
+Action Summary
+
+Use host and network sensor capabilities to assess the state of a system.  
+Identify actions performed post-compromise.  
+Identify indicators of compromise and the threat agent likely responsible.  
+
+
+---
+
+Question 1  
+Using the IOC list, what data or files on the systems were targeted and/or collected by the attacker?
+
+sys.txt - enumeration file
+
+
+Question 2  
+What data or files could be considered IOCs but were not listed on the IOC list? Why do you consider them IOCs?
+
+
+
+
+Question 3  
+What potentially malicious IP addresses and domain names were used in this attack?
+
+loads. listed in notepad.  
+178.105.226.163			   uae.kim  
+148.212.247.185			   updato.systes.net  
+201.70.116.57				   removalmalware.servecounterstrike.com  
+93.212.59.21				   mailchat.zapto.org  
+outlookscansafe.net			
+uae.kim					
+updato.systes.net			
+removalmalware.servecounterstrike.com	
+mailchat.zapto.org			
+
+Question 4  
+Did the attacker successfully escalate privileges?
+
+I believe so, adding a malicious account to administrator group. Also added guest to admin group on 3 boxes.  
+
+
+Question 5  
+What actions did the adversary take to ensure continued access in the event of discovery and remediation?  
+Scheduled task
+
+
+
+Question 6  
+What activities did the attacker perform to discover other potential targets on the network?
+queried shares
+
+
+
+Question 7  
+Were any executables run by the adversary during their operation? What were they? What do they do?
+
+
+
+
+Question 8  
+Is there any evidence of lateral movement or attempts to move laterally through the network?
+definitive, no. circumstantial, yes  
+
+
+
+Question 9  
+What methods of persistence were used by the adversary?  
+Scheduled tasks
+
+
+
+Question 10  
+What malware is present on the system? What do you think it does?  
+
+```
+# N@n0S3rveP@ssw0rd
+Start-Transcript -path "C:\users\dci student\desktop\output3.txt" -append
+$network = "10.10.10"  
+$host_range=7..13  
+$targets = New-Object System.Collections.ArrayList  
+$creds= Get-Credential  
+$files = "c:\users\DCI Student\desktop\aptfiles.txt"  
+
+#test host connectivity. will only establish pssessions with active hosts
+ForEach ($i in $host_range)  
+{
+  $ip="{0}.{1}" -F $network,$i
+  if (Test-Connection -BufferSize 32 -count 1 -quiet -computername $ip)
+  {
+    echo "$ip is alive!"
+    $targets.Add($ip)
+  }
+}
+
+#begin connections and surveys
+
+foreach ($item in $targets)  
+{
+  $sess = New-PSSession -ComputerName $item -Credential $creds
+  copy-item -tosession $sess -Path $files -destination "c:\"
+  invoke-command -computername $item -credential $creds -command {
+  $f = get-content c:\aptfiles.txt
+  foreach ($l in $f){
+  echo "searching for $l on $item"
+    get-childitem -path c:\ -force -filter $l -recurse -erroraction silentlycontinue  | select fullname,directory
+    }
+  }
+}
+stop-transcript
+```
+
+
+`ipconfig /displaydns`  
+get DNS cache ^  
