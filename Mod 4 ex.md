@@ -7,7 +7,7 @@
 Question 1  
 What happens when the user runs the Google Chrome browser?
 
-It opens directly to "youtu.be"  
+It opens directly to "https://youtu.be/dQw4w9WgXcQ"  
 
 
 
@@ -898,3 +898,123 @@ stop-transcript
 
 `ipconfig /displaydns`  
 get DNS cache ^  
+
+
+
+## Mod 4 Exam  
+---
+IOC list are located in the EOM content zip folder. EOM password: Mod4FinalP@ssw0rd  
+Only ONE of the computers has ANY IOCs to find on it  
+For question one you'll use pcap netplan.sh in /usr/local/bin (SO sensor)  
+ 
+sudo tcpreplay -i eth0 -M 10 /usr/local/bin/netplan.sh &
+
+
+Question 1  
+After implementing the updated sensor placement plan (SPP) and monitoring the network, what network IOC associated with APT28 was identified?  
+
+``` 
+A DNS request from 172.29.234.51 for "www.biocpl.org" is located - C&C server for APT28. DNS server responds with "93.184.215.200". After this DNS query, an HTTPS session opens with this IP from internal IP 172.29.234.47.     
+
+Towards the end of the capture, we see internal IP 172.29.234.37 send a DNS query for domain "www.virusdefender.org", another IOC for this APT. This DNS reply is 104.171.117.216. No further traffic was seen related to this IP or domain.  
+```
+
+Question 2  
+Reporting IOC and Next Actions  
+
+You have reported your findings up the chain of command. It was de-conflicted with the CTE team in order to confirm it is malicious. The CTE team stated it wasn't them. The Supported Command has been briefed of the active intrusion into their network. The CND Manager has delegated the Pre-Approved Actions to other members of the Squad so that they can isolate, contain and analyze the compromise. The CND Manager wants you to continue to monitor the network to identify any other suspicious or malicious activity. APT28’s end state is to compromise and exfiltrate information from database servers.
+
+Update IOCs  
+
+The DCI intelligence analyst has received a Cyber Activity Report (CAR) from NTOC that details new IOCs that should be immediately implemented concerning APT28.  
+
+Note: Sensor Placement C was selected due to environment restrictions. You will still be able to monitor effectively with the sensor placed in this location.  
+
+Which server has suspicious network activity?  
+
+```
+Only two IPs on the netmap are alive - only one is able to connect to. We will work from there, 172.16.8.9.  
+```
+__Analyze a Host System__
+
+Perform host analysis of the Windows Server remotely using the Windows 10 CPT box.  
+
+Note 1: If GRR isn't working, please use PowerShell and the SysInternals suite. We recommend using those tools instead of GRR for this portion of the test (hint, hint).   
+
+Note 2: The SysInternals suite is in the Resources Drive in the "other" folder. Make sure to extract to the desktop.   
+
+Note 3: Copy, Install/Run the applications needed to the server from the Windows 10 machine.   
+
+Note 4: APT28 IOC list is in the Resources Drive in the "EOM" Folder then in the MOD4 Exam Folder. The password is Mod4FinalP@ssw0rd.  
+
+```
+alive hosts:  
+172.16.8.5 - can't successfully RDP 
+172.16.8.9 - what are the creds? Administrator\P@ssw0rd
+```
+
+
+Question 3  
+After performing analysis on the suspected host, what malicious registry key is associated with APT28 activity identified previously?   
+`HCKU\SOFTWARE\MICROSOFT\WINDOWS\CURRENTVERSION\RUN\LastEnum = %SYSTEMROOT%\hpinst.exe`  
+
+
+Question 4  
+After performing analysis on the suspected host, what malicious executable, associated with APT28 activity, was identified?  
+```
+FullName       : C:\Documents and Settings\Administrator\Downloads\hpinst.exe
+Directory      : C:\Documents and Settings\Administrator\Downloads
+PSComputerName : 172.16.8.9
+RunspaceId     : 25c9d3c8-4af0-4436-b276-3f5922aef15f
+
+FullName       : C:\Users\Administrator\Downloads\hpinst.exe
+Directory      : C:\Users\Administrator\Downloads
+PSComputerName : 172.16.8.9
+RunspaceId     : 25c9d3c8-4af0-4436-b276-3f5922aef15f
+
+FullName       : C:\Windows\hpinst.exe
+Directory      : C:\Windows
+PSComputerName : 172.16.8.9
+RunspaceId     : 25c9d3c8-4af0-4436-b276-3f5922aef15f
+```
+
+Question 5  
+After performing analysis on the suspected host, what DLL file associated with APT28 activity was identified?  
+```
+FullName       : C:\Windows\apisvcd.dll
+Directory      : C:\Windows
+PSComputerName : 172.16.8.9
+RunspaceId     : 25c9d3c8-4af0-4436-b276-3f5922aef15f
+```
+
+Question 6  
+After performing analysis on the suspected host, which memory object (mutex) was identified?  
+
+hpinst is PID 3336
+```
+C:\>handle -a -p 3336 | findstr /c:Mutant
+  2A4: Mutant        \Sessions\1\BaseNamedObjects\sSbydFdIob6NrhNTJcF89uDqE2
+```
+
+
+ASijnoKGszdpodPPiaoaghj8127391   
+ASLIiasiuqpssuqkl713h  
+513AbTAsEpcq4mf6TEacB  
+__sSbydFdIob6NrhNTJcF89uDqE2__  
+B5a20F03e6445A6987f8EC87913c9  
+
+Question 7  
+Identify and Report Exfil Artifacts  
+
+What findings uncovered during your analysis should be coordinated or reported to other elements within your CPT? Detail these findings here and identify to what CPT mission element they should be reported. Identify and report exfil artifacts.  
+
+hpinst.exe and apisvcd.dll have the same file hash. This hash is not listed in the IOC malware. I recommend getting a malware analyst to crack open this file in a sandbox and see how it works, it could be something new. I took a look at strings but was in over my head, but I did see what could've been signs of host enumeration and exfiltration. I also identified the following information:
+```
+icmpBeacon
+37.220.176.69i
+Password: P@ssw0rdi
+```
+
+172.16.8.9 has an attempted HTTPS connection to the IP annotated in the CAR (37.220.176.69). I would like a network analyst to look further into this connection and see if any prior connections have occurred.  
+
+I would like a host/net analyst duo to dig into the internal IP annotated in the CAR and see if they can find which direction the movement occurred. Who was infected first?   

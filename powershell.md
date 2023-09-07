@@ -10,10 +10,10 @@ Today we take our first look at powershell.
 [ps-session documentation](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enter-pssession?view=powershell-7.3&viewFallbackFrom=powershell-6)  
 
 Ensure PS Remoting is enabled!  
+`Set-NetConnectionProfile -NetworkCategory private`  
 `Enable-PSRemoting`  
 `winrm quickconfig`  
-`Set-NetConnectionProfile -NetworkCategory private`  
-
+`Set-Item wsman:\localhost\client\trustedhosts -Value *`  
 
 Ping Sweep for net enumeration example:  
 `1..20 | % {"10.10.10.$($_): $(Test-Connection -count 1 -comp 10.10.10.$($_) -quiet)"}`  
@@ -35,6 +35,8 @@ Ensure to update the trusted hosts file!
 
 Once we ID our target machine using the ping TTL (windows in 128), we can remotely connect using the following command (CAN NOT BE RUN IN ADMIN PS SESSION):  
 `Enter-PSSession -UseSSL -ComputerName 10.10.10.40 -Credential "DCI Student"`
+
+** Note - no quotes around single word names. UseSSL not always required. Send connection request from a non-admin box!  
 
 Now we can start the exercise... two and a half hours later...  
 
@@ -60,6 +62,8 @@ Event Logs:
 `Get-EventLog -LogName System -Newest 100`  
 `Get-EventLog -LogName System -InstanceID 414 -Newest 100`  
 
+For-each loop to compare files  
+`Get-Content .\apturls.txt | ForEach-Object { select-string -path .\resolved_urls.txt -Pattern $_ }`  
 
 ```
 $port = (443)
@@ -103,3 +107,8 @@ for ($i = [int]$ipRangeStartParts[3]; $i -le [int]$ipRangeEndParts[3]; $i++) {
     }
 }
 ```
+
+`Get-ChildItem -Path <path> -Filter <filename> -Recurse -ErrorAction SilentlyContinue -Force`  
+
+Get files modified recently (last day)  
+`Get-ChildItem -path c:\ -recurse -erroraction silentlycontinue -force | Where-Object {$_.LastWriteTime -gt (Get-Date).AddDays(-1)}`
