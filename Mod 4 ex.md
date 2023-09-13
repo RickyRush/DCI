@@ -78,7 +78,7 @@ homie got PRANKED!
 
 Question 1  
 Identify if there are indicators of compromise in the registry.  
-`Get-Item -path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` 
+`Get-Item -path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run`   
 I would say yes - sus values in run key.   
 
 Question 2  

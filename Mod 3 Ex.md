@@ -797,7 +797,8 @@ Question 4
 Using either a terminal or regedit, find all registry registry key's that have matching IOCs. What are the executables referenced that match IOCs? Place your answer in alphabetical order with spaces between multiple answers.  
 `get-item -path HKLM:\Software\Microsoft\Windows\CurrentVersion\Run`  
 `get-item -path HKCU:\Software\Microsoft\Windows\CurrentVersion\Run`  
-
+rouj.exe  
+runinfo.exe  
 
 Question 5  
 Find the service name that matches the IOC list. What is the binary path of the executable it references (including the executable itself)?  

@@ -563,7 +563,7 @@ How many total UDP packets were sent to 10.10.10.10?
 
 Question 3  
 The UDP communication used what port?  
-53  
+53  (8000?)  
 
 Question 4  
 How many TCP connections to 10.10.10.10 contained the content "delete"?  
@@ -780,13 +780,107 @@ OpenVAS results
 - FTP cleartext login (how do you fix this? thats like the big thing about ftp)  
 - Telnet cleartext login (block telnet, move to SSH)  
 - http server active, disable  
+- create administrator /   
 
 10.10.10.12 (Voter Email Server)  
 - vulnerable to eternal blue. PATCH IMMEDIATELY!  
 - SMTP, POP3 cleartext login. enable encryption!    
 - Deprecated TLS/SSL - install latest update  
+- change admin password `net user administrator newpass`  
+- disable guest `net user guest /active:no`  
+- firewall `enable-netfirewallrule`
 
-10.10.10.11 (Voter DB)  
-- Vulnerable to eternal blue. PATCH IMMEDIATELY!  
-- FTP cleartext login  
+10.10.10.11 (Voter DB)    
+- Vulnerable to eternal blue. PATCH IMMEDIATELY!     
+- FTP cleartext login     
 - Deprecated TLS/SSL - install latest update  
+- change admin password `net user administrator newpass`    
+- disable guest `net user guest /active:no`    
+- firewall `enable-netfirewallrule`  
+
+Apparently I wasn't supposed to touch the .11! Would've been nice to have in writing!  
+
+Administrator /   
+After changing the pass, our PsSession will end and we will need to re-enter the session.  
+
+```
+Nmap scan report for 10.10.10.11
+Host is up (0.00034s latency).
+Not shown: 994 closed tcp ports (reset)
+PORT     STATE SERVICE
+21/tcp   open  ftp
+135/tcp  open  msrpc
+139/tcp  open  netbios-ssn
+445/tcp  open  microsoft-ds
+3306/tcp open  mysql
+3389/tcp open  ms-wbt-server
+
+Nmap scan report for 10.10.10.12
+Host is up (0.00047s latency).
+Not shown: 992 closed tcp ports (reset)
+PORT     STATE SERVICE
+25/tcp   open  smtp
+110/tcp  open  pop3
+135/tcp  open  msrpc
+139/tcp  open  netbios-ssn
+143/tcp  open  imap
+445/tcp  open  microsoft-ds
+587/tcp  open  submission
+3389/tcp open  ms-wbt-server
+
+Nmap scan report for 10.10.10.13
+Host is up (0.00039s latency).
+Not shown: 990 filtered tcp ports (no-response)
+PORT      STATE  SERVICE
+21/tcp    open   ftp
+22/tcp    open   ssh
+23/tcp    open   telnet
+80/tcp    open   http
+443/tcp   closed https
+445/tcp   open   microsoft-ds
+5901/tcp  open   vnc-1
+8080/tcp  closed http-proxy
+8888/tcp  closed sun-answerbook
+31337/tcp closed Elite
+
+Nmap scan report for 10.10.10.100
+Host is up (0.00022s latency).
+Not shown: 996 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
+
+Nmap scan report for 10.10.10.104
+Host is up (0.00043s latency).
+Not shown: 998 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+3389/tcp open  ms-wbt-server
+
+```
+
+From big brain jacobdouglas40  
+
+One thing I did is disable anonymous login on the FTP server. By editing /etc/vsftpd.conf and changing the line that allows it from YES to NO and doing a service vsftpd restart.   
+
+I changed all passwords for every user and disabled all extra accounts like Guest, sshd, and User.   
+
+I created a script that uses winscp to automatically backup important server files to the FTP server. Then made a scheduled task for it.   
+
+I disabled the ssh service on the VoterDB server.  
+
+Here's an example command with a script to setup automatic backup for FTP "C:\Program Files (x86)\WinSCP\WinSCP.com" /script="C:\Users\DCI Student\Desktop\backup.bat"   
+```
+    option batch abort
+    option confirm off
+    option transfer binary
+    open ftp://student:P@ssw0rd@10.10.10.13:21
+    pwd
+    put C:\backup\* /"Voting Backup"/10.10.10.10/backup/
+    put C:\xampp\* /"Voting Backup"/10.10.10.10/xampp/
+    put C:\VoteDB\* /"Voting Backup"/10.10.10.10/VoteDB/
+    pwd
+    exit
+```
