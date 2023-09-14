@@ -128,7 +128,7 @@ The last thing needed for the Windows server is to identify what was left on it 
 
 `get-eventlog -logname Security -Message *172.16.12.3* | select -ExpandProperty message | findstr "Source Port"`  
 
-`Get-EventLog -LogName Security | where-object {$_.message -like "*172.16.12.3*"} |Select -first 5000 | select -ExpandProperty Message | findstr "Port" | ForEach-Object {$_.split(":")[1]} | group-object -NoElement`  
+`Get-EventLog -LogName Security | where-object {$_.message -like "*172.16.12.2*"} |Select -first 5000 | select -ExpandProperty Message | findstr "Port" | ForEach-Object {$_.split(":")[1]} | group-object -NoElement`  
 
 Question 6  
 What source ports have been used by the CPT's Windows 10 host? Note: Look for IP 172.16.12.3. There are 12 total results, but select only from the following:  
@@ -152,7 +152,7 @@ What does the above impersonation level answer represent?
 Admin creds to log in using NTLM  
 
 
-`(get-eventlog -logname Security -InstanceId 4624 -Message *172.16.12.3*).count`  
+`(get-eventlog -logname Security -InstanceId 5085 -Message *172.16.12.3*).count`  
 Question 9  
 How many times, before today, does the Instance ID of 4624 show up corresponding to the IP address 172.16.12.3?  
 
@@ -201,9 +201,27 @@ Using dc3dd, wipe the mission data from the IR Drive and verify with xxd. Use th
 
 `fdisk -l`  
 `dc3dd wipe=/dev/nvme1n1 pat=dac1`  
+`dc3dd wipe=/dev/nvme1n1 tpat="text here"`  
 `xxd -s 901 -l 1 /dev/nvme1n1`  
+
 
 Question 11  
 What value is represented at the 902nd byte after running xxd? __0 index! Keep in mind when running xxd__
 
-![Alt text](image-5.png)
+![Alt text](image-6.png)
+
+![Alt text](image-7.png)
+
+![Alt text](image-8.png)
+
+![Alt text](image-9.png)
+
+![Alt text](image-10.png)
+
+![Alt text](image.png)
+
+![Alt text](image-2.png)
+
+![Alt text](image-1.png)
+
+![Alt text](image-3.png)
